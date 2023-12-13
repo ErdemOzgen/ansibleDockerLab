@@ -6,7 +6,7 @@ python3 -m pip install ansible
 # Generate keypair and distribute it to controller and managed node so ansuser can run playbooks using the keys
 ssh-keygen -b 2048 -t rsa -f /home/ansuser/.ssh/id_rsa -q -N ""
 
-for host in anscontroller ansubuntu ansalpine ansrocky; do
+for host in anscontroller ansubuntu ansalpine; do
         echo "++ Copying Key to ${host}"
         sshpass -p 'password123' ssh-copy-id -o "StrictHostKeyChecking=no" ansuser@$host
 done
