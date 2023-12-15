@@ -1,6 +1,6 @@
 # ANSIBLE LAB SETUP USING DOCKER
 
-If you are looking for a quick lab setup to play with ansible then docker is the best choice. This repository contains 4 node lab setup.
+If you are looking for a quick lab setup to play with ansible then docker is the best choice. This repository contains 3 node lab setup.
 
 ### Prerequisite
 
@@ -9,7 +9,7 @@ If you are looking for a quick lab setup to play with ansible then docker is the
 
 ### Lab Setup
 
-This lab setup has 3 nodes where one node will act as controller and three nodes will act as managed nodes.
+This lab setup has 3 nodes where one node will act as controller and other 2 nodes will act as managed nodes.
 
 | NODE TYPE | IMAGE | IMAGE NAME| CONTAINER NAME | NETWORK |
 |:-----:|:-----:|:----:|:-----:|:----:|

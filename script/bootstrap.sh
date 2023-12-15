@@ -8,7 +8,7 @@ ssh-keygen -b 2048 -t rsa -f /home/ansuser/.ssh/id_rsa -q -N ""
 
 for host in anscontroller ansubuntu ansalpine; do
         echo "++ Copying Key to ${host}"
-        sshpass -p 'password123' ssh-copy-id -o "StrictHostKeyChecking=no" ansuser@$host
+        sshpass -p 'password123' ssh-copy-id -i /home/ansuser/.ssh/id_rsa -o "StrictHostKeyChecking=no" ansuser@$host
 done
 
 # Generate sample setup
@@ -27,8 +27,7 @@ echo -e "++ Generating hosts file file\n"
 echo -e "[servers]
 anscontroller 
 ansubuntu 
-ansalpine
-ansrocky" > hosts
+ansalpine" > hosts
 
 # Generating sample playbook
 ansible servers -i /home/ansuser/sample_project/hosts -m shell -a "cat /etc/os-release | grep -i PRETTY_NAME" --key-file /home/ansuser/.ssh/id_rsa -o
