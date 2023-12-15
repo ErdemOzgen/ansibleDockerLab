@@ -29,5 +29,17 @@ anscontroller
 ansubuntu 
 ansalpine" > hosts
 
+# Playbook file
+echo -e "++ Generating sample playbook\n"
+echo -e "- name: My first play
+  hosts: servers
+  tasks:
+   - name: Ping my hosts
+     ansible.builtin.ping:
+
+   - name: Print message
+     ansible.builtin.debug:
+      msg: Hello world" > playbook.yml
+
 # Generating sample playbook
 ansible servers -i /home/ansuser/sample_project/hosts -m shell -a "cat /etc/os-release | grep -i PRETTY_NAME" --key-file /home/ansuser/.ssh/id_rsa -o
