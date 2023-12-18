@@ -2,7 +2,7 @@ FROM alpine:latest
 LABEL AUTHOR "ErdemOzgen"
 
 # Install packages
-RUN apk update && apk add vim curl wget py3-pip openssh sudo net-tools iputils jq
+RUN apk update && apk add vim curl wget py3-pip openssh sudo net-tools iputils jq nano
 
 # Create ANSUSER, .ssh directory and set ownsership,permission
 RUN adduser -D ansuser -s /bin/sh -G wheel \
