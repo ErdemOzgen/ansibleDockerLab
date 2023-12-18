@@ -27,7 +27,8 @@ echo -e "++ Generating hosts file file\n"
 echo -e "[servers]
 anscontroller 
 ansubuntu 
-ansalpine" > hosts
+ansalpine
+anscentos" > hosts
 
 # Playbook file
 echo -e "++ Generating sample playbook\n"
