@@ -37,6 +37,17 @@ services:
     networks:
       - ansible_network
     pull_policy: build
+  
+  # Centos node
+  centos:
+    build: 
+      context: .
+      dockerfile: centos/Dockerfile
+    image: anslab/centos
+    container_name: anscentos
+    networks:
+      - ansible_network
+    pull_policy: build
 
     
 networks:
