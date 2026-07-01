@@ -1,34 +1,32 @@
-FROM ubuntu:26.04
+FROM rockylinux/rockylinux:10
 
 LABEL org.opencontainers.image.authors="ErdemOzgen"
-LABEL org.opencontainers.image.description="Ubuntu managed node for the Ansible Docker lab"
+LABEL org.opencontainers.image.description="Rocky Linux managed node for the Ansible Docker lab"
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN dnf -y update \
+    && dnf -y install \
         bash \
+        bind-utils \
         curl \
-        iproute2 \
-        iputils-ping \
+        iproute \
+        iputils \
         jq \
         nano \
         net-tools \
-        openssh-client \
+        openssh-clients \
         openssh-server \
+        procps-ng \
         python3 \
-        python3-apt \
         sudo \
-        vim \
+        vim-minimal \
         wget \
-    && rm -rf /var/lib/apt/lists/*
+        which \
+    && dnf clean all
 
 RUN useradd --create-home --shell /bin/bash ansuser \
-    && usermod --append --groups sudo ansuser \
+    && usermod --append --groups wheel ansuser \
     && install -d -m 700 -o ansuser -g ansuser /home/ansuser/.ssh \
     && install -d -m 755 /run/sshd /var/run/sshd \
-    && touch /home/ansuser/.hushlogin \
-    && chown ansuser:ansuser /home/ansuser/.hushlogin \
     && echo "ansuser ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/ansuser \
     && chmod 440 /etc/sudoers.d/ansuser \
     && echo "root:password123" | chpasswd \
@@ -36,7 +34,6 @@ RUN useradd --create-home --shell /bin/bash ansuser \
     && printf '%s\n' \
         "PasswordAuthentication yes" \
         "PermitRootLogin yes" \
-        "UsePAM yes" \
         >>/etc/ssh/sshd_config
 
 COPY script/entrypoint.sh /usr/local/bin/entrypoint.sh

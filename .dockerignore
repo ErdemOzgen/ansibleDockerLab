@@ -1,0 +1,9 @@
+.git
+.cache
+.pytest_cache
+.venv
+__pycache__
+*.pyc
+*.retry
+*.log
+.DS_Store

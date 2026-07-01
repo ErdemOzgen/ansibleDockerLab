@@ -1,17 +1,11 @@
 #!/bin/sh
+set -eu
 
-# Generate rsa and dsa key
+mkdir -p /run/sshd /var/run/sshd
+ssh-keygen -A
 
-if [ ! -f "/etc/ssh/ssh_host_rsa_key" ]; then
-	ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa
+if [ -f /run/nologin ]; then
+	rm -f /run/nologin
 fi
-
-if [ ! -f "/etc/ssh/ssh_host_dsa_key" ]; then
-	ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa
-fi
-
-if [ -f "/run/nologin" ]; then
-	rm /run/nologin
-fi 
 
 exec "$@"

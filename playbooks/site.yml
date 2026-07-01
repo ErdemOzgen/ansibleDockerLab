@@ -1,0 +1,21 @@
+---
+- name: Validate managed node access
+  hosts: managed
+  gather_facts: true
+  tasks:
+    - name: Ping managed node
+      ansible.builtin.ping:
+
+    - name: Report operating system
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} runs {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    - name: Confirm passwordless sudo
+      ansible.builtin.command: id -u
+      become: true
+      changed_when: false
+      register: become_user_id
+
+    - name: Report sudo result
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} become user id is {{ become_user_id.stdout }}"

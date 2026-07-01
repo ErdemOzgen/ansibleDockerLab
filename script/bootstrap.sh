@@ -1,46 +1,33 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# Install ansible using pip3
-python3 -m pip install ansible
+PROJECT_DIR="${PROJECT_DIR:-/workspace}"
+LAB_USER="${ANSIBLE_LAB_USER:-ansuser}"
+LAB_PASSWORD="${ANSIBLE_LAB_PASSWORD:-password123}"
+SSH_DIR="${HOME}/.ssh"
+SSH_KEY="${SSH_DIR}/id_ed25519"
+MANAGED_HOSTS=(ansubuntu ansalpine ansrocky)
 
-# Generate keypair and distribute it to controller and managed node so ansuser can run playbooks using the keys
-ssh-keygen -b 2048 -t rsa -f /home/ansuser/.ssh/id_rsa -q -N ""
+mkdir -p "${SSH_DIR}"
+chmod 700 "${SSH_DIR}"
 
-for host in anscontroller ansubuntu ansalpine; do
-        echo "++ Copying Key to ${host}"
-        sshpass -p 'password123' ssh-copy-id -i /home/ansuser/.ssh/id_rsa -o "StrictHostKeyChecking=no" ansuser@$host
+if [[ ! -f "${SSH_KEY}" ]]; then
+    echo "++ Generating SSH key for ${LAB_USER}"
+    ssh-keygen -t ed25519 -f "${SSH_KEY}" -N "" -q -C "ansible-lab@anscontroller"
+fi
+
+for host in "${MANAGED_HOSTS[@]}"; do
+    echo "++ Installing controller SSH key on ${host}"
+    ssh-keygen -R "${host}" >/dev/null 2>&1 || true
+    sshpass -p "${LAB_PASSWORD}" ssh-copy-id \
+        -f \
+        -i "${SSH_KEY}.pub" \
+        -o StrictHostKeyChecking=no \
+        -o UserKnownHostsFile=/dev/null \
+        "${LAB_USER}@${host}"
 done
 
-# Generate sample setup
-mkdir sample_project
-cd sample_project
+cd "${PROJECT_DIR}"
 
-# Ansible.cfg file
-echo -e "++ Generating ansible.cfg file\n"
-echo -e "[defaults]
-inventory = hosts
-host_key_checking = False
-nocows = 1" > ansible.cfg
-
-# Hosts file
-echo -e "++ Generating hosts file file\n"
-echo -e "[servers]
-anscontroller 
-ansubuntu 
-ansalpine
-anscentos" > hosts
-
-# Playbook file
-echo -e "++ Generating sample playbook\n"
-echo -e "- name: My first play
-  hosts: servers
-  tasks:
-   - name: Ping my hosts
-     ansible.builtin.ping:
-
-   - name: Print message
-     ansible.builtin.debug:
-      msg: Hello world" > playbook.yml
-
-# Generating sample playbook
-ansible servers -i /home/ansuser/sample_project/hosts -m shell -a "cat /etc/os-release | grep -i PRETTY_NAME" --key-file /home/ansuser/.ssh/id_rsa -o
+echo "++ Verifying Ansible connectivity"
+ansible managed -m ping

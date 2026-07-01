@@ -1,0 +1,14 @@
+---
+repos:
+  - repo: local
+    hooks:
+      - id: yamllint
+        name: yamllint
+        entry: yamllint .
+        language: system
+        pass_filenames: false
+      - id: ansible-lint
+        name: ansible-lint
+        entry: ansible-lint playbooks/site.yml
+        language: system
+        pass_filenames: false

@@ -1,26 +1,38 @@
-FROM alpine:latest
-LABEL AUTHOR "ErdemOzgen"
+FROM alpine:3.24
 
-# Install packages
-RUN apk update && apk add vim curl wget py3-pip openssh sudo net-tools iputils jq nano
+LABEL org.opencontainers.image.authors="ErdemOzgen"
+LABEL org.opencontainers.image.description="Alpine managed node for the Ansible Docker lab"
 
-# Create ANSUSER, .ssh directory and set ownsership,permission
-RUN adduser -D ansuser -s /bin/sh -G wheel \
-    && echo "PermitRootLogin yes" >> /etc/ssh/sshd_config \
-    && echo "ansuser ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers \
-    && mkdir -p /var/run/sshd
+RUN apk add --no-cache \
+        bash \
+        curl \
+        iproute2 \
+        iputils \
+        jq \
+        nano \
+        net-tools \
+        openssh \
+        python3 \
+        sudo \
+        vim \
+        wget
 
-# Copy entrypoint script
-COPY script/entrypoint.sh /usr/local/bin
-RUN chmod u+x /usr/local/bin/entrypoint.sh
+RUN adduser -D -s /bin/sh -G wheel ansuser \
+    && install -d -m 700 -o ansuser -g ansuser /home/ansuser/.ssh \
+    && install -d -m 755 /run/sshd /var/run/sshd \
+    && echo "ansuser ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/ansuser \
+    && chmod 440 /etc/sudoers.d/ansuser \
+    && echo "root:password123" | chpasswd \
+    && echo "ansuser:password123" | chpasswd \
+    && printf '%s\n' \
+        "PasswordAuthentication yes" \
+        "PermitRootLogin yes" \
+        >>/etc/ssh/sshd_config
 
-# Set root user and ansuser password
-RUN echo "root:password123" | chpasswd
-RUN echo "ansuser:password123" | chpasswd
+COPY script/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod 755 /usr/local/bin/entrypoint.sh
 
-# SSHD will listen at port 22
 EXPOSE 22
 
-# Start SSHD service
-ENTRYPOINT ["entrypoint.sh"]
-CMD ["/usr/sbin/sshd","-D"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/usr/sbin/sshd", "-D", "-e"]
